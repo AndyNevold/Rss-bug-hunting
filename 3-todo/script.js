@@ -11,11 +11,15 @@ let currentFilter = "all";
 let nextId = 1;
 
 function addTask() {
-  const text = input.value;
-  errorEl.hidden = true;
-  tasks.push({ id: nextId++, text: text, done: false });
-  input.value = "";
-  render();
+  const text = input.value.trim();
+  if (text) {
+    errorEl.hidden = true;
+    tasks.push({ id: nextId++, text, done: false });
+    render();
+    input.value = "";
+  } else {
+    errorEl.hidden = false;
+  }
 }
 
 function toggleTask(id) {
@@ -43,33 +47,36 @@ function updateCounter() {
 }
 
 function render() {
+  list.replaceChildren();
   const visible = getVisibleTasks();
-  for (let i = 1; i <= visible.length; i++) {
+  for (let i = 0; i <= visible.length - 1; i++) {
     const task = visible[i];
-    const li = document.createElement("li");
-    li.className = "task";
-    if (task.done) {
-      li.classList.add("completed");
+    if (task) {
+      const li = document.createElement("li");
+      li.className = "task";
+      if (task.done) {
+        li.classList.add("completed");
+      }
+
+      const span = document.createElement("span");
+      span.className = "task__text";
+      span.textContent = task.text;
+      span.addEventListener("click", () => toggleTask(task.id));
+
+      const del = document.createElement("button");
+      del.className = "task__del";
+      del.textContent = "✕";
+      del.addEventListener("click", () => deleteTask(task.id));
+
+      li.appendChild(span);
+      li.appendChild(del);
+      list.appendChild(li);
     }
-
-    const span = document.createElement("span");
-    span.className = "task__text";
-    span.textContent = task.text;
-    span.addEventListener("click", () => toggleTask(task.id));
-
-    const del = document.createElement("button");
-    del.className = "task__del";
-    del.textContent = "✕";
-    del.addEventListener("click", () => deleteTask(task.id));
-
-    li.appendChild(span);
-    li.appendChild(del);
-    list.appendChild(li);
   }
   updateCounter();
 }
 
-addBtn.addEventListener("dblclick", addTask);
+addBtn.addEventListener("click", addTask);
 clearBtn.addEventListener("click", clearCompleted);
 
 filterButtons.forEach((btn) => {
