@@ -57,13 +57,15 @@ function addToCart(idCart) {
 
 function increaseQty(id) {
   const item = cart.find((i) => i.id === id);
-  item.qty;
+  item.qty++;
   renderCart();
 }
 
 function decreaseQty(id) {
   const item = cart.find((i) => i.id === id);
-  item.qty--;
+  if (item.qty > 1) {
+    item.qty--;
+  }
   renderCart();
 }
 
@@ -73,22 +75,26 @@ function removeItem(id) {
 }
 
 function applyPromo() {
-  if ((promoInput.value = "SALE10")) {
+  if (promoInput.value === "SALE10") {
     discount = 0.1;
+  } else {
+    discount = 0;
   }
   renderCart();
 }
 
 function clearCart() {
-  cart.splice(0, 1);
+  cart = [];
+  discount = 0;
+  promoInput.value = "";
   renderCart();
 }
 
 function renderCart() {
-  cartItemsEl.innerHTML = "";
-  let total = "";
+  cartItemsEl.replaceChildren();
+  let total = 0;
   cart.forEach((item) => {
-    const lineTotal = item.price;
+    const lineTotal = item.price * item.qty;
     const li = document.createElement("li");
     li.className = "cart-item";
     li.innerHTML = `<span>${item.name}</span>
@@ -114,9 +120,11 @@ function renderCart() {
     total = total - total * discount;
   }
 
-  badgeEl.textContent = cart.length;
+  const totalCartItem = cart.reduce((sum, item) => sum + item.qty, 0);
+
+  badgeEl.textContent = totalCartItem;
   totalEl.textContent = total;
-  emptyMsg.hidden = true;
+  emptyMsg.hidden = totalCartItem > 0;
 }
 
 promoBtn.addEventListener("click", applyPromo);
