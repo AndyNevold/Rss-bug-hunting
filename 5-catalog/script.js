@@ -23,7 +23,9 @@ function getFiltered() {
   const sort = sortSelect.value;
 
   if (search) {
-    result = result.filter((p) => p.name === search);
+    result = result.filter((p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()),
+    );
   }
 
   if (category !== "all") {
@@ -40,6 +42,7 @@ function getFiltered() {
 }
 
 function render() {
+  grid.replaceChildren();
   const items = getFiltered();
   items.forEach((p) => {
     const card = document.createElement("div");
@@ -57,3 +60,5 @@ sortSelect.addEventListener("change", render);
 resetBtn.addEventListener("click", () => {
   searchInput.value = "";
 });
+
+render();
